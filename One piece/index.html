@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en" class="m-0 p-0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <link href="./src/output.css" rel="stylesheet" />
+    <!-- Removed Framer Motion script as it was not used and causing errors -->
+    <script src="https://unpkg.com/feather-icons"></script>
+    <title>One Piece</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        scroll-behavior: smooth;
+      }
+
+      @import url("https://fonts.googleapis.com/css2?family=Impact&display=swap");
+
+      .impact-font {
+        font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+      }
+
+      .letter-span {
+        display: inline-block;
+        transition: transform 0.3s cubic-bezier(0.17, 0.55, 0.55, 1);
+        white-space: nowrap;
+      }
+
+      .nav-link-interactive {
+        display: inline-block;
+      }
+
+      @media (min-width: 768px) {
+        .nav-link-interactive {
+          transition: transform 0.3s ease-in-out;
+          transform-origin: top right;
+        }
+        .nav-link-interactive:hover {
+          transform: rotate(7deg);
+        }
+      }
+
+      .waifu-image {
+        width: 100%;
+        height: 400px;
+        object-fit: cover;
+        border-radius: 0.5rem;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+          0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      }
+
+      #main-nav.menu-active {
+        transform: translateX(0) !important;
+        -webkit-transform: translateX(0) !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        display: flex !important;
+        pointer-events: auto !important;
+      }
+
+      /* Specific mobile styles */
+      @media (max-width: 767px) {
+        #main-nav {
+          transform: translateX(-100%);
+          -webkit-transform: translateX(-100%);
+        }
+
+        #main-nav.menu-active {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background-color: rgba(0, 0, 0, 0.95);
+          z-index: 9999;
+        }
+      }
+
+      body.menu-open-no-scroll {
+        overflow: hidden;
+      }
+
+      .music-icon-bar {
+        animation: sound-wave 1.2s linear infinite alternate;
+        transform-origin: bottom;
+      }
+      .music-icon-bar:nth-child(1) {
+        animation-delay: -0.4s;
+      }
+      .music-icon-bar:nth-child(2) {
+        animation-delay: -0.2s;
+      }
+      .music-icon-bar:nth-child(3) {
+        animation-delay: 0s;
+      } /* Corrected from -0.0s to 0s for clarity */
+
+      @keyframes sound-wave {
+        0% {
+          transform: scaleY(0.2);
+        }
+        25% {
+          transform: scaleY(0.7);
+        }
+        50% {
+          transform: scaleY(0.4);
+        }
+        75% {
+          transform: scaleY(0.9);
+        }
+        100% {
+          transform: scaleY(0.2);
+        }
+      }
+
+      /* Loading Animation Styles */
+      #loading-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: #000;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 10000;
+        transition: opacity 0.8s ease-out, visibility 0.8s ease-out;
+        overflow: hidden;
+      }
+
+      .loading-hidden {
+        opacity: 0;
+        visibility: hidden;
+      }
+
+      /* Straw Hat Pirates Logo Background */
+      .pirate-logo-bg {
+        position: absolute;
+        width: 300px;
+        height: 300px;
+        opacity: 0.1;
+        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="%23e22b1c"/><circle cx="35" cy="40" r="8" fill="%23fff"/><circle cx="65" cy="40" r="8" fill="%23fff"/><path d="M35 55 Q50 70 65 55" stroke="%23fff" stroke-width="4" fill="none"/><path d="M30 20 L70 20 L70 35 L30 35 Z" fill="%23f3ce82"/></svg>');
+        background-repeat: no-repeat;
+        background-size: contain;
+        animation: rotate 20s linear infinite;
+      }
+
+      @keyframes rotate {
+        from {
+          transform: rotate(0deg);
+        }
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .straw-hat {
+        width: 120px;
+        height: 120px;
+        position: relative;
+        margin-bottom: 30px;
+      }
+
+      .hat-top {
+        width: 120px;
+        height: 40px;
+        background-color: #f3ce82;
+        border-radius: 50% / 100% 100% 0 0;
+        position: absolute;
+        top: 0;
+        left: 0;
+        overflow: hidden;
+        animation: hat-bounce 1.5s ease-in-out infinite;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      .hat-middle {
+        width: 140px;
+        height: 15px;
+        background-color: #e22b1c;
+        position: absolute;
+        top: 40px;
+        left: -10px;
+        animation: hat-band-pulse 1.5s ease-in-out infinite;
+      }
+
+      .hat-brim {
+        width: 150px;
+        height: 55px;
+        background-color: #f3ce82;
+        border-radius: 50% / 0 0 100% 100%;
+        position: absolute;
+        top: 55px;
+        left: -15px;
+        overflow: hidden;
+        transform-origin: center top;
+        animation: hat-brim-wave 1.5s ease-in-out infinite;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      }
+
+      /* Hat Pattern */
+      .hat-top:after,
+      .hat-brim:after {
+        content: "";
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background-image: repeating-linear-gradient(
+          90deg,
+          transparent,
+          transparent 10px,
+          rgba(0, 0, 0, 0.1) 10px,
+          rgba(0, 0, 0, 0.1) 12px
+        );
+      }
+
+      @keyframes hat-bounce {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-10px);
+        }
+      }
+
+      @keyframes hat-brim-wave {
+        0%,
+        100% {
+          transform: scaleY(1);
+        }
+        50% {
+          transform: scaleY(1.1);
+        }
+      }
+
+      @keyframes hat-band-pulse {
+        0%,
+        100% {
+          transform: scaleX(1);
+        }
+        50% {
+          transform: scaleX(1.05);
+        }
+      }
+
+      .loading-text {
+        font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+        color: white;
+        font-size: 28px;
+        letter-spacing: 3px;
+        margin-top: 20px;
+        position: relative;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+      }
+
+      .loading-text:after {
+        content: "";
+        position: absolute;
+        width: 0;
+        height: 4px;
+        background-color: #e22b1c;
+        bottom: -10px;
+        left: 0;
+        animation: loading-bar 2s ease-in-out infinite;
+      }
+
+      /* Ocean Waves Effect */
+      .ocean-waves {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 60px;
+        background: linear-gradient(to bottom, transparent, #0066cc 40%);
+        transform-origin: center bottom;
+        animation: wave-animation 3s ease-in-out infinite;
+      }
+
+      /* Floating Skulls */
+      .floating-skull {
+        position: absolute;
+        width: 40px;
+        height: 40px;
+        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="%23fff" opacity="0.7"/><circle cx="35" cy="40" r="8" fill="%23000"/><circle cx="65" cy="40" r="8" fill="%23000"/><path d="M35 65 Q50 80 65 65" stroke="%23000" stroke-width="4" fill="none"/><path d="M25 25 L75 25 L65 45 L35 45 Z" fill="%23000"/></svg>');
+        background-repeat: no-repeat;
+        background-size: contain;
+        opacity: 0.2;
+      }
+
+      .skull-1 {
+        top: 15%;
+        left: 20%;
+        animation: float-animation 8s ease-in-out infinite;
+      }
+
+      .skull-2 {
+        top: 60%;
+        right: 15%;
+        animation: float-animation 6s ease-in-out infinite 1s;
+      }
+
+      .skull-3 {
+        bottom: 70%;
+        right: 30%;
+        animation: float-animation 10s ease-in-out infinite 2s;
+      }
+
+      @keyframes float-animation {
+        0%,
+        100% {
+          transform: translateY(0) rotate(0);
+        }
+        25% {
+          transform: translateY(-15px) rotate(5deg);
+        }
+        50% {
+          transform: translateY(0) rotate(0);
+        }
+        75% {
+          transform: translateY(15px) rotate(-5deg);
+        }
+      }
+
+      @keyframes wave-animation {
+        0%,
+        100% {
+          transform: scaleY(1) translateY(0);
+        }
+        50% {
+          transform: scaleY(1.3) translateY(-10px);
+        }
+      }
+
+      @keyframes loading-bar {
+        0% {
+          width: 0;
+        }
+        50% {
+          width: 100%;
+        }
+        100% {
+          width: 0;
+        }
+      }
+
+      .hidden {
+        display: none !important;
+      }
+    </style>
+  </head>
+  <body class="impact-font bg-black">
+    <!-- Loading Screen -->
+    <div id="loading-screen">
+      <div class="pirate-logo-bg"></div>
+      <div class="floating-skull skull-1"></div>
+      <div class="floating-skull skull-2"></div>
+      <div class="floating-skull skull-3"></div>
+      <div class="straw-hat">
+        <div class="hat-top"></div>
+        <div class="hat-middle"></div>
+        <div class="hat-brim"></div>
+      </div>
+      <div class="loading-text">SET SAIL TO GRAND LINE...</div>
+      <div class="ocean-waves"></div>
+    </div>
+
+    <div class="relative h-screen overflow-hidden">
+      <!-- Background Music -->
+      <audio id="background-audio" autoplay loop>
+        <!-- ATTENTION: src is "song.mp4" and type is "audio/mpeg". 
+                 Ensure "song.mp4" is a valid audio source playable by browsers with this type,
+                 or change to a standard audio format like .mp3 and update src/type. -->
+        <source src="./img-video-music/song.mp4" type="audio/mpeg" />
+        Your browser does not support the audio element.
+      </audio>
+
+      <!-- Video Background -->
+      <video
+        autoplay
+        loop
+        muted
+        playsinline
+        class="absolute top-0 left-0 w-full h-full object-cover"
+      >
+        <source src="./img-video-music/videoplayback.mp4" type="video/mp4" />
+        Your browser does not support the video tag.
+      </video>
+
+      <div
+        class="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-black/50 to-black/70 z-0"
+      ></div>
+
+      <!-- Header -->
+      <header
+        class="flex justify-between items-center px-4 sm:px-8 py-2.5 text-white z-30 relative text-2xl"
+      >
+        <div class="flex items-center">
+          <a href="#" class="text-white tracking-wider text-2xl sm:text-3xl"
+            >ONE PIECE</a
+          >
+          <!-- Music Toggle Button -->
+          <button
+            id="music-toggle-button"
+            title="Toggle Music"
+            class="ml-3 sm:ml-4 text-white p-1 focus:outline-none"
+          >
+            <!-- Playing Bars -->
+            <svg
+              id="music-playing-icon"
+              class="w-5 h-5 sm:w-6 sm:h-6"
+              viewBox="0 0 24 28"
+              fill="currentColor"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <rect
+                class="music-icon-bar"
+                x="2"
+                y="8"
+                width="4"
+                height="12"
+                rx="1"
+              />
+              <rect
+                class="music-icon-bar"
+                x="10"
+                y="4"
+                width="4"
+                height="20"
+                rx="1"
+              />
+              <rect
+                class="music-icon-bar"
+                x="18"
+                y="10"
+                width="4"
+                height="8"
+                rx="1"
+              />
+            </svg>
+            <!-- Inline Muted Icon -->
+            <svg
+              id="music-muted-icon"
+              class="hidden w-5 h-5 sm:w-6 sm:h-6"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+              <line x1="23" y1="9" x2="17" y2="15"></line>
+              <line x1="17" y1="9" x2="23" y2="15"></line>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Hamburger Button -->
+        <button
+          id="hamburger-button"
+          class="md:hidden z-50 text-white p-2 -mr-2"
+        >
+          <!-- Replacing feather icon with direct SVG -->
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="32"
+            height="32"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="w-7 h-7 sm:w-8 sm:h-8"
+          >
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+
+        <!-- Navigation Links -->
+        <nav
+          id="main-nav"
+          class="fixed inset-0 bg-black/95 backdrop-blur-sm flex flex-col items-center justify-center transform -translate-x-full transition-transform duration-300 ease-in-out z-50 md:relative md:inset-auto md:flex-row md:bg-transparent md:backdrop-blur-none md:translate-x-0 md:justify-end md:w-auto"
+        >
+          <ul
+            class="flex flex-col items-center justify-center h-full space-y-6 sm:space-y-7 text-xl sm:text-2xl md:flex-row md:space-y-0 md:space-x-4 lg:space-x-8 md:text-lg lg:text-xl md:h-auto"
+          >
+            <li class="absolute top-5 right-5 sm:top-7 sm:right-7 md:hidden">
+              <button id="close-menu-button" class="text-white p-2">
+                <!-- Replacing feather icon with direct SVG -->
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="32"
+                  height="32"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="w-8 h-8 sm:w-10 sm:h-10"
+                >
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            </li>
+            <!-- Simplified nav link classes from boss's code, removed some specific ones we discussed earlier -->
+            <li>
+              <a
+                href="#"
+                class="nav-link-interactive text-white px-3 py-2 rounded-lg hover:bg-white hover:text-black"
+                >Home</a
+              >
+            </li>
+            <li>
+              <a
+                href="#characters-section"
+                class="nav-link-interactive text-white px-3 py-2 rounded-lg hover:bg-white hover:text-black"
+                >Characters</a
+              >
+            </li>
+            <li>
+              <a
+                href="#pics-section"
+                class="nav-link-interactive text-white px-3 py-2 rounded-lg hover:bg-white hover:text-black"
+                >Pics</a
+              >
+            </li>
+            <li>
+              <a
+                href="#waifus-section"
+                class="nav-link-interactive text-white px-3 py-2 rounded-lg hover:bg-white hover:text-black"
+                >Waifus</a
+              >
+            </li>
+          </ul>
+        </nav>
+      </header>
+    </div>
+
+    <!-- Characters Section -->
+    <section id="characters-section" class="bg-black p-4 md:p-8">
+      <div class="mx-auto max-w-5xl tracking-wider" id="links-container">
+        <!-- Links will be added here by JavaScript -->
+      </div>
+    </section>
+
+    <!-- Islands Grid Section (Pics Section) -->
+    <section
+      id="pics-section"
+      class="min-h-screen bg-black pt-16 pb-16 px-4 sm:px-8"
+    >
+      <div class="max-w-7xl mx-auto bg-white p-6 sm:p-8 rounded-3xl shadow-2xl">
+        <h2 class="text-4xl md:text-5xl font-bold mb-12 text-center text-black">
+          ONE PIECE ISLANDS
+        </h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div class="rounded-2xl overflow-hidden group relative h-80">
+            <img
+              src="./img-video-music/thumb-1920-1368841.jpeg"
+              alt="Egg Head"
+              class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+            />
+            <div
+              class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex items-end p-6"
+            >
+              <h3 class="text-white text-2xl font-bold drop-shadow-lg">
+                Egg Head
+              </h3>
+            </div>
+          </div>
+          <div class="rounded-2xl overflow-hidden group relative h-80">
+            <img
+              src="./img-video-music/sabaody.jpg"
+              alt="Sabaody"
+              class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+            />
+            <div
+              class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex items-end p-4"
+            >
+              <h3 class="text-white text-xl font-bold drop-shadow-lg">
+                Sabaody
+              </h3>
+            </div>
+          </div>
+          <div class="rounded-2xl overflow-hidden group relative h-80">
+            <img
+              src="./img-video-music/wano.jpg"
+              alt="Wano"
+              class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+            />
+            <div
+              class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex items-end p-4"
+            >
+              <h3 class="text-white text-xl font-bold drop-shadow-lg">Wano</h3>
+            </div>
+          </div>
+          <div class="rounded-2xl overflow-hidden group relative h-80">
+            <img
+              src="./img-video-music/Punk_Hazard_Infobox-554754588.png"
+              alt="Punk Hazard"
+              class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+            />
+            <div
+              class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex items-end p-4"
+            >
+              <h3 class="text-white text-xl font-bold drop-shadow-lg">
+                Punk Hazard
+              </h3>
+            </div>
+          </div>
+        </div>
+        <div class="mt-8 text-center">
+          <p class="text-gray-600">Explore the most iconic locations</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Waifus Section -->
+    <section id="waifus-section" class="bg-black pt-8 pb-16 px-4 sm:px-8">
+      <div
+        class="max-w-7xl mx-auto bg-gray-800 p-6 sm:p-8 rounded-3xl shadow-2xl"
+      >
+        <h2
+          class="text-4xl md:text-5xl font-bold mb-12 text-center text-white pb-5"
+        >
+          WAIFU MOMENTS
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-4">
+          <div class="rounded-lg overflow-hidden group h-64">
+            <img
+              src="./img-video-music/nami___one_piece__ai_generated__by_beastcr_dfx77h6-pre-201668034.jpg"
+              alt="Nami"
+              class="waifu-image w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+            />
+          </div>
+          <div class="rounded-lg overflow-hidden group h-64">
+            <img
+              src="./img-video-music/boahancock.jpg"
+              alt="Boa Hancock"
+              class="waifu-image w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+            />
+          </div>
+          <div class="rounded-lg overflow-hidden group h-64">
+            <img
+              src="./img-video-music/robin.jpg"
+              alt="Nico Robin"
+              class="waifu-image w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+            />
+          </div>
+          <div class="rounded-lg overflow-hidden group h-64">
+            <img
+              src="./img-video-music/Uta_-_One_Piece_-_Waifu_-_Ecchi_-_Oppai_-_Free_-_Wallpaper_-_Download_-_Desktop-2750081305.jpg"
+              alt="Uta"
+              class="waifu-image w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+            />
+          </div>
+          <div class="rounded-lg overflow-hidden group h-64">
+            <img
+              src="./img-video-music/bonney.jpg"
+              alt="Jewelry Bonney"
+              class="waifu-image w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+            />
+          </div>
+          <div class="rounded-lg overflow-hidden group h-64">
+            <img
+              src="./img-video-music/yamato.jpg"
+              alt="Yamato"
+              class="waifu-image w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+            />
+          </div>
+        </div>
+        <div class="mt-8 text-center">
+          <p class="text-gray-400">YOU WILL LOVE EVERY ONE OF THEM!</p>
+        </div>
+      </div>
+    </section>
+
+    <script src="./script.js"></script>
+  </body>
+</html>
